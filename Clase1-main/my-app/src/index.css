@@ -1,0 +1,325 @@
+
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+
+/* Estilos para productos, fuera de la media query */
+.productos-lista {
+  display: flex;
+  justify-content: center;
+  gap: 40px; /* Espacio entre tarjetas */
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+.producto-card {
+  background: #23232b;
+  border: 1px solid #aaa;
+  border-radius: 10px;
+  width: 330px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.13);
+  padding: 25px;
+}
+
+.producto-imagen {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+.producto-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: 120px;
+  margin-bottom: 10px;
+}
+
+.producto-titulo {
+  margin: 0;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.producto-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.producto-descripcion {
+  color: #bdbdbd;
+  font-size: 1rem;
+}
+
+.producto-precio {
+  color: #ffa5a5;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-left: auto;
+}
+
+/* Cambios solo para modo claro (si quieres que sean diferentes) */
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+  .producto-card {
+    background: #fafaff; /* fondo más claro si deseas */
+    border-color: #ccd;
+  }
+  .producto-titulo {
+    color: #222;
+  }
+  .producto-descripcion {
+    color: #444;
+  }
+}
+.productos-lista {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+.producto-card {
+  background: #23232b;
+  border: 1px solid #aaa;
+  border-radius: 10px;
+  width: 330px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.13);
+  padding: 25px;
+}
+
+.producto-imagen {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+.producto-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: 130px; /* Ajusta según lo que necesites */
+  margin-bottom: 10px;
+}
+
+.producto-titulo {
+  margin: 0 0 12px 0;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.producto-descripcion {
+  color: #bdbdbd;
+  font-size: 1rem;
+  min-height: 44px;  /* Igual altura para todas las descripciones */
+  margin-bottom: 16px;
+  display: block;
+}
+
+.producto-precio {
+  color: #ffa5a5;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+/* Oculta el panel generado por main.js */
+#navPanel,
+#titleBar {
+  display: none !important;
+}
+
+/* ==== NAVBAR ==== */
+#header {
+  background: #1c1d26;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* Logo texto */
+.logo-text {
+  color: #fff;
+  font-size: 20px;
+  margin: 0;
+}
+
+/* Navegación escritorio */
+.desktop-nav ul {
+  display: flex;
+  gap: 25px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.desktop-nav a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.desktop-nav a:hover {
+  color: #00bfff;
+}
+
+/* Botón hamburguesa */
+#menuToggle {
+  background: none;
+  border: 2px solid #fff;
+  color: #fff;
+  font-size: 24px;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  display: none;
+}
+
+/* === PANEL LATERAL === */
+#navPanel {
+  position: fixed;
+  left: -260px;
+  top: 0;
+  width: 260px;
+  height: 100vh;
+  background: #1c1d26;
+  overflow-y: auto;
+  transition: left 0.3s ease;
+  z-index: 2000;
+  padding-top: 70px;
+}
+
+#navPanel.visible {
+  left: 0;
+}
+
+#navPanel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#navPanel a {
+  display: block;
+  color: #fff;
+  padding: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+#navPanel a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Fondo oscuro */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1500;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+
+  #menuToggle {
+    display: block;
+  }
+}
+

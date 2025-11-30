@@ -1,0 +1,48 @@
+
+/* Asegura que las imágenes principales ocupen toda la pantalla */
+.image.fit.main {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100vh; /* Hace que ocupe toda la altura visible */
+  overflow: hidden;
+}
+
+.image.fit.main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ajusta la imagen sin deformarla */
+  object-position: center; /* Centra la imagen */
+  display: block;
+}
+
+/* Evita que el texto se superponga mal en pantallas grandes */
+.spotlight {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.spotlight .content {
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.4); /* Mantiene contraste si ya lo usabas */
+  color: white;
+  padding: 2rem;
+  border-radius: 10px;
+}
+
+/* Ajuste para pantallas medianas o pequeñas */
+@media (max-width: 980px) {
+  .image.fit.main {
+    height: 60vh;
+  }
+  .spotlight {
+    flex-direction: column;
+    min-height: auto;
+  }
+  .spotlight .content {
+    padding: 1rem;
+  }
+}
