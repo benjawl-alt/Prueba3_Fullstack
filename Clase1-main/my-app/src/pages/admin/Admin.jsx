@@ -10,16 +10,16 @@ import {
   LogOut,
 } from "lucide-react";
 
-// Importar componentes de administración
+
 import Dashboard from "./Dashboard";
 import Ordenes from "./Ordenes";
 import ProductosAdmin from "./ProductosAdmin";
 import CategoriasAdmin from "./CategoriasAdmin";
 import UsuariosAdmin from "./UsuariosAdmin";
-import "../../assets/admin.css"; // Estilos del panel
+import "../../assets/admin.css"; 
 import { BASE_SERVER_IP } from "../../config";
 
-// URLs de los Microservicios
+
 const ORDENES_API_URL = `${BASE_SERVER_IP}:8083/api/ordenes`;
 const PRODUCTOS_API_URL = `${BASE_SERVER_IP}:8080/api/autos`;
 const USUARIOS_API_URL = `${BASE_SERVER_IP}:8081/api/usuarios`;
@@ -32,8 +32,8 @@ export default function Admin() {
     totalIngresos: 0,
     totalProductos: 0,
     totalUsuarios: 0,
-    aumentoCompras: 0, // Sigue siendo aleatorio/simulado
-    aumentoUsuarios: 0, // Sigue siendo aleatorio/simulado
+    aumentoCompras: 0, 
+    aumentoUsuarios: 0, 
     cargando: true,
   });
 
@@ -82,11 +82,11 @@ export default function Admin() {
     }
   };
   
-  // 🛑 Reemplazo de useEffect de localStorage
+  
   useEffect(() => {
     cargarEstadisticas();
     
-    // Opcional: Recargar estadísticas si hay cambios en las órdenes o productos
+    
     const handleUpdate = () => cargarEstadisticas();
     window.addEventListener("productosActualizados", handleUpdate);
     window.addEventListener("usuarioCreado", handleUpdate);
@@ -98,7 +98,7 @@ export default function Admin() {
   }, []);
 
   const handleLogout = () => {
-    // Lógica de cierre de sesión
+    
     localStorage.removeItem("usuarioActivo");
     navigate("/");
   };

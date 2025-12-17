@@ -10,7 +10,7 @@ export default function UsuariosAdmin() {
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState(null);
 
-    // --- LECTURA DE DATOS (API GET) ---
+    
     const cargarDatos = async () => {
         setCargando(true);
         setError(null);
@@ -35,7 +35,7 @@ export default function UsuariosAdmin() {
         cargarDatos();
     }, []);
 
-    // --- LÓGICA CRUD API ---
+    
 
     const handleCrear = async () => {
         if (!nuevoUsuario.nombre.trim() || !nuevoUsuario.email.trim()) {

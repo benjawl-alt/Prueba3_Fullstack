@@ -20,21 +20,21 @@ const Checkout = () => {
     const [touched, setTouched] = useState({});
     const [total, setTotal] = useState(0);
 
-    // 1. 🔄 Cargar datos iniciales al montar
+    
     useEffect(() => {
-        // Leemos el total del sessionStorage
+        
         const totalGuardado = Number(sessionStorage.getItem("currentCartTotal")) || 0;
         
         setTotal(totalGuardado);
         
-        // Usar datos del usuario logueado para autocompletar
+        
         setForm((prev) => ({
             ...prev,
             nombre: usuario?.nombre || "", 
             correo: usuario?.email || "",
         }));
 
-        // Opcional: Cargar datos de entrega previos (si existen en sessionStorage)
+        
         const datosEntregaPrevios = JSON.parse(sessionStorage.getItem("datosEntrega")) || {};
         if (datosEntregaPrevios.calle) {
              setForm(prev => ({
@@ -55,11 +55,11 @@ const Checkout = () => {
         setTouched({ ...touched, [name]: true });
     };
 
-    // 2. 💰 Manejador de pago (Valida y guarda en sessionStorage ANTES de ir al comprobante)
+    
     const handlePagar = (e) => {
         e.preventDefault();
 
-        // 🛑 Validamos campos obligatorios
+        
         const camposObligatorios = ["apellido", "calle", "region", "comuna"];
         const faltantes = camposObligatorios.filter((campo) => !form[campo]?.trim());
 
@@ -70,7 +70,7 @@ const Checkout = () => {
             return;
         }
 
-        // ✅ GUARDAR DATOS DE ENTREGA EN SESSION STORAGE
+        
         sessionStorage.setItem("datosEntrega", JSON.stringify(form));
 
         navigate("/comprobante");
@@ -101,7 +101,7 @@ const Checkout = () => {
                     onBlur={handleBlur}
                     placeholder="Nombre"
                     style={styles.input}
-                    disabled={!!usuario?.nombre} // Deshabilitar si viene del Contexto
+                    disabled={!!usuario?.nombre} 
                 />
 
                 <input

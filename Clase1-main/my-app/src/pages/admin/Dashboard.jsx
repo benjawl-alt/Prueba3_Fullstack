@@ -17,12 +17,12 @@ export default function Dashboard() {
     const [mensajes, setMensajes] = useState([]);
     const [mostrarReportes, setMostrarReportes] = useState(false);
 
-    // --- FUNCIÓN DE CARGA DE ESTADÍSTICAS DESDE LAS APIS ---
+    
     const cargarEstadisticas = async () => {
         setStats(prev => ({ ...prev, cargando: true }));
 
         try {
-            // Fetch de datos de los 3 microservicios
+            
             const [comprasResponse, productosResponse, usuariosResponse] = await Promise.all([
                 fetch(ORDENES_API_URL),
                 fetch(PRODUCTOS_API_URL),
@@ -33,7 +33,7 @@ export default function Dashboard() {
             const productosData = await productosResponse.json();
             const usuariosData = await usuariosResponse.json();
 
-            // Cálculo de Estadísticas Reales
+            
             const totalCompras = comprasData.reduce(
                 (acc, compra) => acc + (compra.total || 0),
                 0
@@ -41,13 +41,13 @@ export default function Dashboard() {
             const totalProductos = productosData.length;
             const totalUsuarios = usuariosData.length;
 
-            // Lógica simulada de inventario (asumimos que el stock está en el objeto de productos)
+            
             const inventario = productosData.reduce(
                 (acc, p) => acc + (p.stock || 0),
                 0
             );
 
-            // Cálculos Simulados (se mantienen)
+            
             const probabilidad = Math.floor(Math.random() * 50) + 10;
             const crecimiento = Math.floor(Math.random() * 40);
             const nuevosUsuarios = Math.floor(totalUsuarios / 4); // Simulación de nuevos usuarios
@@ -63,8 +63,8 @@ export default function Dashboard() {
                 cargando: false,
             });
 
-            // NOTA: Para el historial de contacto, necesitas un API que guarde esos mensajes.
-            setMensajes([]); // Dejamos vacío ya que no hay API para mensajes de contacto
+            
+            setMensajes([]); 
             
         } catch (error) {
             console.error("Fallo al cargar estadísticas del administrador:", error);
@@ -72,7 +72,7 @@ export default function Dashboard() {
         }
     };
     
-    // 🛑 Reemplazo de useEffect de localStorage
+    
     useEffect(() => {
         cargarEstadisticas();
     }, []);
@@ -93,7 +93,7 @@ export default function Dashboard() {
             <h1> Dashboard</h1>
             <p>Resumen general de tu tienda</p>
 
-            {/* ✅ AJUSTE CLAVE: Aplicaremos el diseño 2x2 a admin-cards vía CSS */}
+            {/*  AJUSTE CLAVE: Aplicaremos el diseño 2x2 a admin-cards vía CSS */}
             <div className="admin-cards" style={styles.grid2x2}> 
                 
                 {/* 1. Compras */}
@@ -125,7 +125,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* 🔽 Botón para mostrar/ocultar reportes */}
+            {/*  Botón para mostrar/ocultar reportes */}
             <div style={{ marginTop: "30px", textAlign: "center" }}>
                 <button
                     className="btn-reportes"
@@ -135,7 +135,7 @@ export default function Dashboard() {
                 </button>
             </div>
 
-            {/* 🧾 Sección de reportes */}
+            {/*  Sección de reportes */}
             {mostrarReportes && (
                 <div className="reportes-container">
                     <h2>📨 Mensajes de contacto</h2>
@@ -159,12 +159,12 @@ export default function Dashboard() {
     );
 }
 
-// Estilos específicos para forzar la rejilla 2x2
+
 const styles = {
-    // ESTE ESTILO FUERZA EL LAYOUT 2x2 EN EL DASHBOARD
+    
     grid2x2: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)', /* Crea dos columnas iguales */
+        gridTemplateColumns: 'repeat(2, 1fr)', 
         gap: '20px',
         width: '100%',
         marginTop: '20px'

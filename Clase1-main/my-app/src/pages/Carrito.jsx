@@ -5,43 +5,43 @@ import { CARRITO_API_URL, AUTOS_API_URL } from "../config";
 
 
 const Carrito = () => {
-    // Solo necesitamos el objeto usuario del contexto
+    
     const { usuario } = useContext(CarritoContext); 
     
-    const [cartItems, setCartItems] = useState([]); // Ítems detallados para la tabla
+    const [cartItems, setCartItems] = useState([]); 
     const [cargando, setCargando] = useState(true);
     const navigate = useNavigate();
 
     const userId = usuario?.id; 
 
-    // 1. 🌐 Función para obtener los datos del carrito desde la API
+    
     const fetchCartItems = async () => {
         if (!userId) return;
 
         setCargando(true);
         try {
-            // 1. Obtener ítems del carrito (ID de auto, cantidad)
+            
             const cartResponse = await fetch(`${CARRITO_API_URL}/${userId}`);
             
-            // Si la respuesta es 404 o no OK, asumimos carrito vacío.
+            
             if (!cartResponse.ok && cartResponse.status !== 404) {
                  throw new Error(`Error al obtener carrito: ${cartResponse.status}`);
             }
             
             const cartData = await cartResponse.json();
             
-            // Si el carrito está vacío, terminamos la carga.
+            
             if (!cartData || cartData.length === 0) {
                  setCartItems([]);
                  return;
             }
 
-            // 2. Obtener los detalles de cada Auto desde el microservicio de Autos
+            
             const detailedItems = await Promise.all(
                 cartData.map(async (item) => {
                     const autoResponse = await fetch(`${AUTOS_API_URL}/${item.autoId}`);
                     
-                    // 🛑 Manejo de Auto no encontrado
+                    
                     if (!autoResponse.ok) {
                         console.warn(`Detalles del Auto ID ${item.autoId} no encontrados.`);
                         return null; 
@@ -49,33 +49,33 @@ const Carrito = () => {
                     
                     const autoDetails = await autoResponse.json();
                     
-                    // Combina los datos para el renderizado
+                    
                     return {
                         ...item, 
                         ...autoDetails,
-                        itemId: item.id // ID del registro de la tabla carrito_items
+                        itemId: item.id 
                     };
                 })
             );
 
-            // Filtra cualquier resultado nulo que provenga de un auto eliminado
+            
             const validDetailedItems = detailedItems.filter(item => item !== null);
             setCartItems(validDetailedItems);
 
         } catch (error) {
             console.error("Error al cargar el carrito o detalles del auto:", error);
-            // Dejamos un mensaje para el usuario si es un error de conexión grave.
+            
         } finally {
-            // ✅ CRÍTICO: Asegura que el estado de carga termine.
+            
             setCargando(false); 
         }
     };
 
-    // 2. 🔄 Carga de datos al montar (y al actualizarse)
+    
     useEffect(() => {
         fetchCartItems();
         
-        // Listener para recargar cuando se añade un nuevo ítem desde Productos.jsx
+        
         const handleCartUpdate = () => { fetchCartItems(); };
         window.addEventListener('carritoActualizado', handleCartUpdate);
         
@@ -83,18 +83,18 @@ const Carrito = () => {
     }, [userId]); 
 
 
-    // 3. 🆕 Manejador para actualizar cantidad (PUT a la API)
+    
     const handleActualizarCantidad = async (itemId, nuevaCantidad) => {
         const cantidadEntera = parseInt(nuevaCantidad);
         if (cantidadEntera < 1 || isNaN(cantidadEntera)) return;
 
-        // 1. Optimista: Actualizamos la UI inmediatamente
+        
         setCartItems(prev => prev.map(item => 
             item.itemId === itemId ? { ...item, cantidad: cantidadEntera } : item
         ));
 
         try {
-            // 2. LLAMADA PUT A LA API de Carrito
+            
             const response = await fetch(`${CARRITO_API_URL}/${itemId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -115,14 +115,14 @@ const Carrito = () => {
     };
 
 
-    // 4. 🗑️ Manejador para eliminar (DELETE a la API)
+    
     const handleEliminar = async (itemId) => {
         try {
-            // Llamada DELETE a la API de Carrito
+            
             const response = await fetch(`${CARRITO_API_URL}/${itemId}`, { method: 'DELETE' });
             
             if (response.ok) {
-                // Si la API tuvo éxito, actualizamos el estado local
+                
                 setCartItems(prev => prev.filter(item => item.itemId !== itemId));
             } else {
                  alert("No se pudo eliminar el ítem del carrito.");
@@ -142,7 +142,7 @@ const Carrito = () => {
             return;
         }
         
-        // Guardamos el carrito completo y el total en la SESIÓN
+        
         sessionStorage.setItem("currentCartItems", JSON.stringify(cartItems));
         sessionStorage.setItem("currentCartTotal", total.toString());
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AUTOS_API_URL} from "../../config";
+import { AUTOS_API_URL } from "../../config"; 
 
 export default function ProductosAdmin() {
     const [productos, setProductos] = useState([]);
@@ -12,7 +12,7 @@ export default function ProductosAdmin() {
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState(null);
 
-    // --- LÓGICA CRUD API (Mantenida) ---
+    
     const cargarProductos = async () => {
         setCargando(true);
         setError(null);
@@ -22,13 +22,13 @@ export default function ProductosAdmin() {
             
             const data = await response.json();
             
-            // Filtro de producto fantasma
+            
             const productosReales = data.filter(p => p.marca !== "Z-Admin");
             
             setProductos(productosReales); 
         } catch (err) {
             console.error("Error fetching products:", err);
-            setError("No se pudo conectar con la API de Autos (8080).");
+            setError("No se pudo conectar con la API de Autos. Revisa la consola.");
         } finally {
             setCargando(false);
         }
@@ -40,23 +40,130 @@ export default function ProductosAdmin() {
         return () => window.removeEventListener("productosActualizados", cargarProductos);
     }, []);
 
-    const agregarProducto = async () => { /* ... lógica de POST ... */ };
-    const eliminarProducto = async (id) => { /* ... lógica de DELETE ... */ };
-    const iniciarEdicion = (p) => { setEditando(p.id); setEditado({ ...p }); };
-    const guardarEdicion = async () => { /* ... lógica de PUT ... */ };
-    const cancelarEdicion = () => { setEditando(null); setEditado({}); };
+    
+    const agregarProducto = async () => {
+        // Validación básica
+        if (!nuevo.marca || !nuevo.modelo || !nuevo.precio) {
+            return alert("Completa al menos marca, modelo y precio.");
+        }
 
-    // --- Renderizado ---
+        
+        const producto = {
+            ...nuevo,
+            anio: parseInt(nuevo.anio) || 2024, 
+            precio: parseFloat(nuevo.precio) || 0.0,
+            stock: parseInt(nuevo.stock) || 0,
+            categoria: nuevo.categoria || 'Otro', 
+        };
+        
+        console.log("Enviando producto:", producto); 
 
-    if (cargando) return <div style={styles.container}>Cargando datos del administrador...</div>;
-    if (error) return <div style={{...styles.container, color: '#e74c3c'}}>Error: {error}</div>;
+        setCargando(true);
+        try {
+            const response = await fetch(AUTOS_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(producto),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.text(); 
+                throw new Error(`Error ${response.status}: ${errorData}`);
+            }
+            
+            await cargarProductos(); 
+            
+            
+            setNuevo({ marca: "", modelo: "", anio: "", precio: "", color: "", descripcion: "", categoria: "", imagen: "", stock: "", });
+            
+            
+            window.dispatchEvent(new Event("productosActualizados")); 
+            alert("Producto agregado exitosamente.");
 
+        } catch (err) {
+            console.error("Error al agregar:", err);
+            setError(`Fallo al agregar: ${err.message}`);
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    
+    const eliminarProducto = async (id) => {
+        if (!window.confirm("¿Eliminar este producto? Esta acción es permanente.")) return;
+        
+        setCargando(true);
+        try {
+            const response = await fetch(`${AUTOS_API_URL}/${id}`, { method: 'DELETE' });
+            
+            if (!response.ok) {
+                 throw new Error(`Error ${response.status}: Fallo al eliminar.`);
+            }
+            
+            await cargarProductos(); 
+
+        } catch (err) {
+            setError(`Fallo al eliminar: ${err.message}`);
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    
+    const iniciarEdicion = (p) => {
+        setEditando(p.id);
+        setEditado({ ...p });
+    };
+
+    const guardarEdicion = async () => {
+        setCargando(true);
+        
+        const productoActualizado = {
+            ...editado,
+            anio: parseInt(editado.anio) || null,
+            precio: parseFloat(editado.precio) || 0,
+            stock: parseInt(editado.stock) || 0,
+            categoria: editado.categoria || 'Otro',
+        };
+
+        try {
+            const response = await fetch(`${AUTOS_API_URL}/${editado.id}`, {
+                method: 'PUT', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productoActualizado),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: Fallo al guardar edición.`);
+            }
+            
+            await cargarProductos();
+            setEditando(null);
+            setEditado({});
+            window.dispatchEvent(new Event("productosActualizados"));
+
+        } catch (err) {
+            setError(`Fallo al guardar: ${err.message}`);
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    const cancelarEdicion = () => {
+        setEditando(null);
+        setEditado({});
+    };
+
+    
+
+    if (cargando && productos.length === 0) return <div style={styles.container}>Cargando datos del administrador...</div>;
+    
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Gestión de Productos</h1>
 
             {error && <p style={styles.errorMessage}>Error: {error}</p>}
-            {cargando && <p style={styles.loadingMessage}>Cargando/Procesando...</p>}
+            {cargando && <p style={styles.loadingMessage}>Procesando...</p>}
 
             {/* ✅ CONTENEDOR PRINCIPAL HORIZONTAL (50/50) */}
             <div style={styles.mainContent}>
@@ -95,7 +202,12 @@ export default function ProductosAdmin() {
                             {productos.map((p) => (
                                 <div key={p.id} style={styles.productCard}>
                                     {p.imagen && (
-                                        <img src={p.imagen} alt={p.modelo} style={styles.image} />
+                                        <img 
+                                            src={p.imagen} 
+                                            alt={p.modelo} 
+                                            style={styles.image}
+                                            onError={(e) => e.target.style.display = 'none'} // Ocultar si falla
+                                        />
                                     )}
                                     <div style={styles.info}>
                                         {/* Lógica de edición en línea */}
@@ -103,7 +215,7 @@ export default function ProductosAdmin() {
                                             <>
                                                 <div style={styles.editGrid}>
                                                     {Object.keys(p).filter(key => key !== 'id' && key !== 'descripcion' && key !== 'imagen').map(key => (
-                                                        <input key={key} value={editado[key]} onChange={(e) => setEditado({ ...editado, [key]: e.target.value })} placeholder={key.charAt(0).toUpperCase() + key.slice(1)} style={styles.editInput} />
+                                                        <input key={key} value={editado[key]} onChange={(e) => setEditado({ ...editado, [key]: e.target.value })} placeholder={key} style={styles.editInput} />
                                                     ))}
                                                     <textarea value={editado.descripcion} onChange={(e) => setEditado({ ...editado, descripcion: e.target.value })} placeholder="Descripción" style={{...styles.editInput, gridColumn: 'span 4'}} />
                                                 </div>
@@ -136,28 +248,17 @@ export default function ProductosAdmin() {
     );
 }
 
-// Lógica CRUD (Stubs para no romper la estructura)
-const cargarProductos = async () => { /* Lógica de fetch de la API */ };
-const agregarProducto = async () => { /* Lógica de POST */ };
-const eliminarProducto = async (id) => { /* Lógica de DELETE */ };
-const iniciarEdicion = (p) => {};
-const guardarEdicion = async () => { /* Lógica de PUT */ };
-const cancelarEdicion = () => {};
-
-
 const styles = {
-    // ✅ AJUSTES DE COLUMNAS PRINCIPALES
     container: { padding: "10px 25px 25px 25px", maxWidth: "1200px", margin: "auto", color: "#fff" }, 
     title: { textAlign: "center", marginBottom: "15px", marginTop: '0' },
     mainContent: {
         display: 'flex',
         gap: '25px',
-        alignItems: 'flex-start', // Asegura que las columnas inicien al mismo nivel
+        alignItems: 'flex-start', 
     },
     formColumn: { flex: '0 0 40%', maxWidth: '40%' },
     listColumn: { flex: '1 1 60%' },
-    listTitle: { marginTop: '0', marginBottom: '10px' }, // Título de la lista más compacto
-    // --- Estilos de Formulario y Lista (Mantenidos) ---
+    listTitle: { marginTop: '0', marginBottom: '10px' }, 
     card: { background: "#2a2a3d", padding: "20px", borderRadius: "12px", boxShadow: "0 4px 10px rgba(0,0,0,0.3)" },
     formGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" },
     input: { padding: "8px", borderRadius: "8px", border: "1px solid #444", backgroundColor: "#3a3a4d", color: "#fff", display: 'block', width: '100%', margin: '0' },

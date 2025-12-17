@@ -2,6 +2,9 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { CarritoContext } from "../context/CarritoContext";
 
+
+import { ORDENES_API_URL, CARRITO_API_URL } from "../config";
+
 const Comprobante_pago = () => {
     const { vaciarCarrito, usuario } = useContext(CarritoContext);
     const navigate = useNavigate();
@@ -12,7 +15,7 @@ const Comprobante_pago = () => {
     const [fechaCompra, setFechaCompra] = useState("");
     const [idCompra, setIdCompra] = useState("");
 
-    // 1. 🔄 Cargar datos desde SESSION STORAGE
+    
     useEffect(() => {
         const newIdCompra = Date.now().toString(36).toUpperCase();
         const newFecha = new Date().toLocaleDateString("es-CL", {
@@ -34,63 +37,65 @@ const Comprobante_pago = () => {
         }
     }, [navigate]);
 
-    // 2. ✅ Manejar el cierre de la compra y limpieza
-    const ORDENES_API_URL = `${BASE_SERVER_IP}:8083/api/ordenes`;
-    const CARRITO_API_URL = `${BASE_SERVER_IP}:8082/api/carrito`; 
+    
+    const handleVolverInicio = async () => { 
+        const userId = usuario?.id;
+        
+        if (carrito.length === 0 || total === 0) {
+            navigate("/");
+            return;
+        }
+        
+        
+        const nuevaOrden = {
+            userId: userId, 
+            nombreCliente: (datosEntrega.nombre || "") + " " + (datosEntrega.apellido || ""), 
+            correoCliente: datosEntrega.correo,
+            total: total,
+            
+            
+            items: carrito.map((item) => ({
+                autoId: item.id, 
+                marcaModelo: item.marca + " " + item.modelo, 
+                precioUnitario: item.precio,
+                cantidad: item.cantidad,
+            })),
+            
+            
+            calle: datosEntrega.calle,
+            comuna: datosEntrega.comuna,
+            region: datosEntrega.region,
+        };
 
-const handleVolverInicio = async () => { // Hacemos la función asíncrona
-    const userId = usuario?.id;
-    
-    // ... (Validación de carrito vacío) ...
-    
-    // 🛑 1. CONSTRUIR EL OBJETO DE ORDEN COMPLETO
-    const nuevaOrden = {
-        userId: userId, 
-        nombreCliente: datosEntrega.nombre + " " + datosEntrega.apellido, // Usamos datos del formulario
-        correoCliente: datosEntrega.correo,
-        total: total,
-        
-        // Mapeamos los ítems del carrito para la tabla de items de la orden
-        items: carrito.map((item) => ({
-            autoId: item.id, // Es el ID del Auto del catálogo (8080)
-            marcaModelo: item.marca + " " + item.modelo, // Guardamos el nombre para el historial
-            precioUnitario: item.precio,
-            cantidad: item.cantidad,
-        })),
-        
-        // Guardamos los datos de envío
-        calle: datosEntrega.calle,
-        comuna: datosEntrega.comuna,
-        region: datosEntrega.region,
-        // (Otros campos de envío)
+        try {
+            
+            await fetch(ORDENES_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(nuevaOrden),
+            });
+
+            
+            if (userId) {
+                 await fetch(`${CARRITO_API_URL}/vaciar/${userId}`, { method: 'DELETE' });
+            }
+            
+            
+            sessionStorage.removeItem("currentCartItems");
+            sessionStorage.removeItem("currentCartTotal");
+            sessionStorage.removeItem("datosEntrega"); 
+            if (vaciarCarrito) vaciarCarrito();
+            
+            
+            navigate("/");
+
+        } catch (error) {
+            console.error("Fallo la transacción de compra:", error);
+            navigate("/"); 
+        }
     };
-
-    try {
-        // 🛑 2. POST AL MICROSERVICIO DE ÓRDENES (Guarda el historial permanentemente)
-        await fetch(ORDENES_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(nuevaOrden),
-        });
-
-        // 🛑 3. DELETE AL MICROSERVICIO DE CARRITO (Limpia la base de datos temporal)
-        // Este endpoint lo creamos en el paso anterior
-        await fetch(`${CARRITO_API_URL}/vaciar/${userId}`, { method: 'DELETE' });
-        
-        // 4. Limpiamos SessionStorage y el estado de React
-        sessionStorage.removeItem("currentCartItems");
-        sessionStorage.removeItem("currentCartTotal");
-        sessionStorage.removeItem("datosEntrega"); 
-        if (vaciarCarrito) vaciarCarrito();
-        
-        // Navegar al inicio
-        navigate("/");
-
-    } catch (error) {
-        console.error("Fallo la transacción de compra:", error);
-        alert("Error al finalizar la compra. Intente nuevamente.");
-    }
-};
+    
+    if (carrito.length === 0) return null;
 
     return (
         <div style={styles.container}>
@@ -145,11 +150,11 @@ const handleVolverInicio = async () => { // Hacemos la función asíncrona
                                     {item.marca} {item.modelo}
                                 </td>
                                 <td style={styles.td}>
-                                    ${item.precio.toLocaleString("es-CL")}
+                                    ${item.precio ? item.precio.toLocaleString("es-CL") : 0}
                                 </td>
                                 <td style={styles.td}>{item.cantidad}</td>
                                 <td style={styles.td}>
-                                    ${(item.precio * item.cantidad).toLocaleString("es-CL")}
+                                    ${item.precio ? (item.precio * item.cantidad).toLocaleString("es-CL") : 0}
                                 </td>
                             </tr>
                         ))}
@@ -171,15 +176,13 @@ const handleVolverInicio = async () => { // Hacemos la función asíncrona
 
 const styles = {
     container: { 
-        // ✅ AJUSTE CLAVE: Reducimos padding superior e inferior
-        padding: "5px 30px 5px 30px", // Más pequeño para acercarse al navbar y al footer
+        padding: "5px 30px 5px 30px", 
         textAlign: "center", 
         display: "flex", 
         flexDirection: "column", 
         alignItems: "center" 
     },
     comprobante: {
-        // ✅ AJUSTE CLAVE: Reducimos padding superior e inferior del contenido interno
         maxWidth: "800px",
         width: "100%",
         padding: "10px 20px 10px 20px", 
@@ -188,7 +191,7 @@ const styles = {
         border: "1px solid #444",
         borderRadius: "12px",
         boxShadow: "0 4px 10px rgba(0,0,0,0.5)",
-        marginBottom: "5px", // Reducido al mínimo
+        marginBottom: "5px", 
     },
     title: { 
         textAlign: "center", 
@@ -201,7 +204,7 @@ const styles = {
         margin: "1px 0"
     },
     sectionTitle: {
-        marginTop: "5px", // ✅ AJUSTE: Reducido
+        marginTop: "5px", 
         marginBottom: "3px", 
         color: "#adb5bd",
         borderBottom: "1px dashed #555",
@@ -214,12 +217,12 @@ const styles = {
     hr: {
         border: "none",
         borderTop: "1px solid #444",
-        margin: "5px 0", // ✅ AJUSTE: Reducido
+        margin: "5px 0", 
     },
     hrTotal: {
         border: "none",
         borderTop: "2px dashed #adb5bd",
-        margin: "5px 0", // ✅ AJUSTE: Reducido
+        margin: "8px 0", 
     },
     table: { 
         width: "100%", 
@@ -229,21 +232,21 @@ const styles = {
     },
     th: {
         borderBottom: "1px solid #444",
-        padding: "4px 5px", // ✅ AJUSTE: Reducido
+        padding: "4px 5px", 
         textAlign: "left",
         backgroundColor: "#2c2f3d",
         fontSize: '0.9rem',
     },
     td: {
         borderBottom: "1px dotted #444",
-        padding: "3px 5px", // ✅ AJUSTE: Reducido
+        padding: "3px 5px", 
         textAlign: "left",
         whiteSpace: 'normal',
         wordWrap: 'break-word',
     },
     tdNombre: {
         borderBottom: "1px dotted #444",
-        padding: "3px 5px", // ✅ AJUSTE: Reducido
+        padding: "3px 5px", 
         textAlign: "left",
         whiteSpace: 'normal',
         wordBreak: 'break-word',
@@ -254,7 +257,7 @@ const styles = {
         textAlign: "right",
         color: "#2ecc71",
         fontSize: "1.5rem",
-        marginTop: "8px", // Reducido
+        marginTop: "8px", 
     },
     btnInicio: {
         backgroundColor: "#3498db",
@@ -263,8 +266,8 @@ const styles = {
         padding: "8px 18px",
         borderRadius: "8px",
         cursor: "pointer",
-        marginTop: "8px", // Reducido
-        marginBottom: '0', // Aseguramos que no tenga margen inferior
+        marginTop: "8px", 
+        marginBottom: '0', 
     },
 };
 

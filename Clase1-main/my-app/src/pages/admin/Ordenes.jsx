@@ -7,7 +7,7 @@ export default function Ordenes() {
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
 
-    // --- LECTURA (GET) ---
+    
     const cargarOrdenes = async () => {
         setCargando(true);
         setError(null);
@@ -30,10 +30,10 @@ export default function Ordenes() {
         }
     };
     
-    // 🛑 Reemplaza el useEffect de localStorage
+    
     useEffect(() => {
         cargarOrdenes();
-        // Nota: Agrega un listener si necesitas actualizar la lista cuando se completa una compra.
+        
     }, []);
 
     const verDetalle = (orden) => {
@@ -44,7 +44,7 @@ export default function Ordenes() {
         setDetalle(null);
     };
 
-    // --- Renderizado ---
+    
 
     if (cargando) {
         return <div style={{ padding: "20px", color: "#fff" }}>Cargando historial de órdenes...</div>;

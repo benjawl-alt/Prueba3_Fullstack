@@ -2,10 +2,11 @@ import React from "react";
 import { Link } from "react-scroll";
 import "../assets/styles.css"; 
 
+
 export default function Inicio() {
   const youtubeEmbedId = "6GZJkofDm6o"; 
   
-  // ✅ CORRECCIÓN: Usamos controls=0 y showinfo/modestbranding para limpiar la interfaz
+  
   const youtubeEmbedUrl = `https://www.youtube.com/embed/${youtubeEmbedId}?autoplay=1&mute=1&loop=1&playlist=${youtubeEmbedId}&controls=0&modestbranding=1&rel=0`;
 
   return (
@@ -120,7 +121,7 @@ export default function Inicio() {
 }
 
 const styles = {
-    // ESTILOS PARA EL CONTENEDOR PRINCIPAL DEL VIDEO (CUBRE LA PANTALLA)
+    
     videoWrapper: {
         position: 'absolute',
         top: 0,
@@ -140,7 +141,7 @@ const styles = {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        // Asegura que cubra el 100% del viewport
+        
         minWidth: '100vw',
         minHeight: '100vh',
         width: 'auto',

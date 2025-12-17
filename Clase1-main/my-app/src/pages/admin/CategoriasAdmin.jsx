@@ -10,7 +10,7 @@ export default function CategoriasAdmin() {
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
 
-    // --- LECTURA DE CATEGORÍAS ÚNICAS DESDE LA API DE AUTOS ---
+    
     const cargarCategorias = async () => {
         setCargando(true);
         setError(null);
@@ -20,17 +20,17 @@ export default function CategoriasAdmin() {
             
             const data = await response.json();
             
-            // 2. Extraer valores únicos de la columna 'categoria'
+            
             const categoriasDeAPI = Array.from(new Set(
                 data
                     .map(p => p.categoria)
                     .filter(c => c && typeof c === 'string') 
             ));
             
-            // 3. Combinar las categorías base con las de la API (excluyendo 'Todos')
+            
             const todasUnicas = Array.from(new Set([...categoriasBase, ...categoriasDeAPI]));
 
-            // Almacenamos la lista final (sin "Todos")
+            
             setCategoriasEnUso(todasUnicas.filter(c => c !== "Todos")); 
 
         } catch (err) {
@@ -43,29 +43,29 @@ export default function CategoriasAdmin() {
     
     useEffect(() => {
         cargarCategorias();
-        // Recargamos si se edita/crea un producto, ya que esto puede añadir una categoría
+        
         window.addEventListener("productosActualizados", cargarCategorias);
         return () => window.removeEventListener("productosActualizados", cargarCategorias);
     }, []);
 
-    // --- LÓGICA DE CREACIÓN (POST para forzar la categoría en la DB) ---
+    
     const agregarCategoria = async () => {
         const nombre = nuevaCategoria.trim();
         if (!nombre) return;
         
-        // Evita duplicados (insensible a mayúsculas/minúsculas)
+        
         if (categoriasEnUso.some(c => c.toLowerCase() === nombre.toLowerCase())) {
             return alert(`La categoría '${nombre}' ya está registrada.`);
         }
 
-        // 🛑 Objeto "fantasma" que se insertará para que la categoría exista en la DB
+        
         const productoFantasma = {
             marca: "Z-Admin", 
             modelo: "Base", 
             anio: 2000, 
             precio: 1.00,
             imagen: "",
-            categoria: nombre, // <--- Dato clave
+            categoria: nombre, 
         };
 
         setCargando(true);
@@ -79,7 +79,7 @@ export default function CategoriasAdmin() {
             await cargarCategorias(); 
             setNuevaCategoria("");
             
-            // Notificamos a otros componentes (como el catálogo principal)
+            
             window.dispatchEvent(new Event("productosActualizados")); 
 
         } catch (err) {
@@ -89,7 +89,7 @@ export default function CategoriasAdmin() {
         }
     };
 
-    // --- 🗑️ LÓGICA DE ELIMINACIÓN DE CATEGORÍA (Eliminar el producto fantasma) ---
+    
     const handleEliminarCategoria = async (nombre) => {
         if (categoriasBase.includes(nombre)) {
             return alert("No puedes eliminar una categoría base.");
@@ -101,24 +101,24 @@ export default function CategoriasAdmin() {
 
         setCargando(true);
         try {
-            // 1. Buscamos el ID del producto fantasma asociado
+            
             const searchResponse = await fetch(AUTOS_API_URL);
             const allProducts = await searchResponse.json();
             
-            // ✅ FILTRO CRÍTICO: Buscamos por marca "Z-Admin" Y la categoría
+            
             const fantasma = allProducts.find(p => 
                 p.marca === "Z-Admin" && p.categoria === nombre
             );
 
             if (fantasma && fantasma.id) { 
-                // 2. Eliminamos el producto fantasma de la DB usando su ID
+               
                 await fetch(`${AUTOS_API_URL}/${fantasma.id}`, { method: 'DELETE' });
                 
-                // 3. Recargamos la lista de categorías
+                
                 await cargarCategorias(); 
                 window.dispatchEvent(new Event("productosActualizados"));
             } else {
-                 // Esto ocurrirá si el producto es real y no un fantasma de Z-Admin.
+                 
                  alert(`La categoría '${nombre}' es usada por productos reales. No se puede eliminar.`);
             }
 

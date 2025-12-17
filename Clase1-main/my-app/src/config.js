@@ -5,7 +5,7 @@
 // 2. Antes de subir a AWS EC2, REEMPLAZA ESTE VALOR con la IP o DNS público de tu instancia EC2.
 
 // Ejemplo para desarrollo (Tu PC):
-const BASE_SERVER_IP = "http://52.55.190.157"; 
+const BASE_SERVER_IP = "http://localhost"; 
 
 // Ejemplo para producción (AWS EC2):
 // const BASE_SERVER_IP = "http://54.234.123.45"; // <--- Tu IP pública de EC2

@@ -11,7 +11,7 @@ export default function Login() {
   const [cargando, setCargando] = useState(false);
   
   const navigate = useNavigate();
-  // ✅ CORRECCIÓN: Desestructuramos solo la función 'login' que necesitamos.
+  
   const { login } = useContext(CarritoContext); 
 
   const manejarSubmit = async (e) => {
@@ -19,7 +19,7 @@ export default function Login() {
     setMensaje("");
     setCargando(true);
 
-    // 1. Manejo del Administrador Fijo (local)
+    
     const adminEmail = "admin@tienda.com";
     const adminPassword = "admin123";
 
@@ -32,7 +32,7 @@ export default function Login() {
       return;
     }
 
-    // 2. Comunicación con la API de Usuarios (Roles: USER)
+    
     try {
       const response = await fetch(LOGIN_API_URL, {
         method: 'POST',
@@ -45,21 +45,21 @@ export default function Login() {
       if (response.ok) {
         const userData = await response.json();
         
-        // 🛑 Llama a la función 'login' del Contexto para guardar y persistir la sesión.
+        
         login(userData); 
         
         setMensaje(`Inicio de sesión exitoso, bienvenido ${userData.nombre}!`);
         setTimeout(() => navigate("/"), 1000);
         
       } else if (response.status === 401) {
-        setMensaje("❌ Email o contraseña incorrectos.");
+        setMensaje(" Email o contraseña incorrectos.");
       } else {
-        setMensaje("❌ Error en el servidor al intentar iniciar sesión.");
+        setMensaje(" Error en el servidor al intentar iniciar sesión.");
       }
       
     } catch (error) {
       console.error("Error al conectar con la API de Login:", error);
-      setMensaje("❌ Error de conexión: Servidor de Usuarios (8081) no disponible.");
+      setMensaje(" Error de conexión: Servidor de Usuarios (8081) no disponible.");
     } finally {
       setCargando(false);
     }
@@ -102,7 +102,7 @@ export default function Login() {
         <p
           style={{
             marginTop: "15px",
-            color: mensaje.includes("❌") || mensaje.includes("incorrectos") ? "red" : "green",
+            color: mensaje.includes("") || mensaje.includes("incorrectos") ? "red" : "green",
           }}
         >
           {mensaje}

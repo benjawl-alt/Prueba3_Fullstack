@@ -3,7 +3,7 @@ import { CarritoContext } from "../context/CarritoContext";
 import { AUTOS_API_URL,CARRITO_API_URL } from "../config";
 
 const Productos = () => {
-    // Categorías base para que los botones iniciales siempre existan
+    
     const categoriasBase = ["Todos", "Sedán", "Deportivo", "SUV"]; 
 
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("Todos"); 
@@ -14,7 +14,7 @@ const Productos = () => {
     const [productos, setProductos] = useState([]);
     const [cargando, setCargando] = useState(true); 
 
-    // --- LÓGICA DE CARGA ---
+    
 
     const cargarProductos = async () => {
         setCargando(true);
@@ -24,14 +24,14 @@ const Productos = () => {
             
             const data = await response.json();
             
-            // ✅ FILTRO CRÍTICO: Excluye el producto fantasma ("Z-Admin") y registros nulos
+            
             const productosValidos = data.filter(p => 
                 p.marca && p.modelo && p.marca !== "Z-Admin" 
             ); 
             
             setProductos(productosValidos);
             
-            // Cargar categorías dinámicamente (se usa 'data' original para incluir 'Camion', por ejemplo)
+            
             cargarCategoriasDinamicas(data);
 
         } catch (error) {
@@ -41,7 +41,7 @@ const Productos = () => {
         }
     };
     
-    // Función para extraer categorías de los datos de la API
+    
     const cargarCategoriasDinamicas = (data) => {
         const categoriasDeAPI = Array.from(new Set(
             data.map(p => p.categoria).filter(c => c && typeof c === 'string')
@@ -66,13 +66,13 @@ const Productos = () => {
         };
     }, []); 
 
-    // 4. Lógica de filtrado
+    
     const productosFiltrados =
         categoriaSeleccionada === "Todos"
             ? productos
             : productos.filter((p) => p.categoria === categoriaSeleccionada);
             
-    // 5. handleAgregar (POST a Carrito - 8082)
+    
     const handleAgregar = async (producto) => {
         if (!usuario || !usuario.id) {
             alert("Debes iniciar sesión para agregar productos al carrito.");
@@ -92,7 +92,7 @@ const Productos = () => {
             window.dispatchEvent(new Event('carritoActualizado')); 
 
         } catch (error) {
-            setMensaje(`❌ Error al añadir el producto: ${error.message}`);
+            setMensaje(` Error al añadir el producto: ${error.message}`);
         }
     };
 
